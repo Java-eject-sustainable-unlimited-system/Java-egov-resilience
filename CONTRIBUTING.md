@@ -20,6 +20,9 @@ openjml --esc --source 17 src/main/java/com/jesus/system/monitor/FailureCounter.
 
 If you change a contract, update the matching JUnit test and [docs/TRACEABILITY.md](docs/TRACEABILITY.md).
 
+## AI-assisted contributions
+AI tools are permitted when implementing this repository. Contributors must disclose AI-generated or materially AI-assisted changes in the pull request description and remain responsible for reviewing their correctness, security, licensing, and tests.
+
 ## Pull requests
 1. Fork and branch from `main`.
 2. Keep changes small and focused; add or update JUnit tests.

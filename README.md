@@ -55,6 +55,12 @@ Licensing
 
 This project uses the MIT License. Commercial and noncommercial use are permitted under its terms. Copyright and license notices from upstream projects must be preserved.
 
+AI Use and Disclosure
+
+AI tools have been used to author parts of this repository's implementation. AI assistance is permitted for contributions; contributors are responsible for reviewing AI-assisted work and disclosing its use.
+
+AI 도구가 이 리포지토리 구현의 일부를 작성하는 데 사용되었습니다. 기여 시 AI 사용이 허용되며, 기여자는 AI가 작성하거나 보조한 내용을 검토하고 AI 사용 사실을 밝혀야 합니다.
+
 ## Watchdog Application Documentation
 
 For the Java watchdog's build and run instructions, activation requirements, safety notes, monitor behavior, and configuration reference, see [README_EN.md](README_EN.md).
