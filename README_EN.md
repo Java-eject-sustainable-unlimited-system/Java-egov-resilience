@@ -3,28 +3,23 @@
 
 # ✝️ J.E.S.U.S (Java Ejectable Survival Unlimited Sustainable System)
 
-> **"The Ultimate Self-Healing Watchdog Agent for Legacy eGovFrame & Enterprise Systems"**
+> A Java 17 / Spring Boot watchdog prototype for legacy eGovFrame and enterprise systems.
 
 ---
 
 ## 🛡️ Overview
-**J.E.S.U.S** is an autonomous, self-healing watchdog agent designed for legacy enterprise and public sector Java/Spring environments (such as eGovFrame). Without relying on external infrastructure orchestrators (like Kubernetes or systemd), J.E.S.U.S operates directly within the application core to continuously monitor system vitals (Process, DB, JVM, and Disk I/O). Upon detecting anomalies or freezes, it independently excises the zombie process and instantly respawns a pristine, immutable artifact via **Nix Flakes**.
+**J.E.S.U.S** is an early-stage Java 17/Spring Boot watchdog prototype for legacy enterprise services. It combines HTTP and TCP probes, optional JDBC checks, watchdog-JVM diagnostics, and disk/I/O checks. After configured failure conditions, it can forcibly terminate matching same-user Java processes and ask Nix to start the configured flake application.
+
+This is not a production-certified recovery system. Recovery is destructive, depends on process matching and Nix being available, and should only be evaluated in a controlled environment. The watchdog's JVM and local filesystem checks describe the process and working directory where the watchdog itself runs; they do not inspect a remote target's JVM or disk.
 
 ---
 
 ## ⚡ Key Features
 
-* **Autonomous Process Excision & Resurrection**
-  * Leverages Java 17 `ProcessHandle` API to precisely target and forcibly terminate (`SIGKILL`) unresponsive legacy processes, followed by instant unpolluted respawning via `nix run`.
-* **Multi-Layer Vitals Sentinel**
-  * **eGovFrame DB Health Check**: Validates JDBC connections (`conn.isValid`) to catch DB locks and connection pool exhaustion in real-time.
-  * **Deep JVM Diagnostics**: Preemptively detects heap exhaustion (92% critical threshold) and thread deadlocks before Garbage Collection locks up.
-  * **Disk & I/O Guard**: Monitors disk space depletion and file system Read-Only lockouts (I/O deadlocks).
-* **Enterprise Observability & Override**
-  * Spring Boot Actuator custom health indicator integration (`/actuator/health`).
-  * Emergency manual control REST API endpoint (`/api/jesus/eject-and-resurrect`) for administrative overrides. It requires the `X-Watchdog-Token` header matching `JESUS_WATCHDOG_MANUAL_CONTROL_TOKEN`; the endpoint is disabled when no token is configured.
-* **Omni-Platform Nix Flakes Arena**
-  * Guarantees bit-identical isolated builds and runtime environments across Linux, macOS, and other target hosts.
+* **Layered probes**: HTTP(S) health endpoint, raw TCP connectivity, optional JDBC connection validation, watchdog-JVM heap/deadlock diagnostics, and local disk/write checks.
+* **Threshold-based recovery**: Most probes require repeated failures before requesting ejection; a detected JVM deadlock and critically low disk space trigger immediately.
+* **Actuator health**: `/actuator/health` reports the watchdog's aggregate monitor vitals. The HTTP endpoint it probes is the monitored target's endpoint.
+* **Optional manual control**: `POST /api/jesus/eject-and-resurrect` is authorized by the `X-Watchdog-Token` header and is disabled unless a non-empty token is configured.
 
 ---
 
@@ -136,6 +131,5 @@ J.E.S.U.S CI/CD Pipeline
 
 
 ---
-
 
 
