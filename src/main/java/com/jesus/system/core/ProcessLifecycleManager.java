@@ -90,9 +90,11 @@ public class ProcessLifecycleManager {
     }
 
     public List<ProcessHandle> findTargetProcesses() {
-        return ProcessHandle.allProcesses()
-                .filter(this::isTargetProcess)
-                .toList();
+        try (var processes = ProcessHandle.allProcesses()) {
+            return processes
+                    .filter(this::isTargetProcess)
+                    .toList();
+        }
     }
 
     private boolean isTargetProcess(ProcessHandle process) {
