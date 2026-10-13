@@ -13,7 +13,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  *
  * <p>Adding this JAR to the classpath is enough — all watchdog monitors,
  * the lifecycle core, the health indicator and the REST API are registered
- * automatically. Disable anytime with {@code jesus.watchdog.enabled=false}.
+ * automatically when {@code jesus.watchdog.enabled=true}; destructive
+ * monitoring is disabled unless the host explicitly opts in.
  *
  * <p>Note for javax-era eGovFrame (Spring Boot 2.x) hosts: the Jakarta
  * namespace makes direct embedding impossible — keep running the watchdog
@@ -28,6 +29,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "com.jesus.system.api",
         "com.jesus.system.health"
 })
-@ConditionalOnProperty(prefix = "jesus.watchdog", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "jesus.watchdog", name = "enabled", havingValue = "true")
 public class JesusWatchdogAutoConfiguration {
 }

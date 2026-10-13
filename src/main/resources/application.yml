@@ -1,4 +1,5 @@
 server:
+  address: 127.0.0.1 # Manual control and health endpoints are local-only by default.
   port: 9090 # Watchdog's own port; the monitored legacy target is expected on 8080.
 
 spring:
@@ -9,10 +10,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health
+  endpoint:
+    health:
+      show-details: never
 
 jesus:
   watchdog:
+    enabled: true # Standalone app explicitly opts in; embedded hosts must opt in themselves.
     # Target process identification (Java 17 ProcessHandle matching)
     process-command-keyword: java
     target-process-keywords: [ egov, tomcat ]

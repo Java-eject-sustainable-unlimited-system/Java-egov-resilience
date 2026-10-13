@@ -24,8 +24,18 @@ class JesusWatchdogAutoConfigurationTest {
             .withConfiguration(AutoConfigurations.of(JesusWatchdogAutoConfiguration.class));
 
     @Test
-    void registersFullWatchdogStackByDefault() {
+    void doesNotRegisterDestructiveWatchdogStackWithoutExplicitOptIn() {
         contextRunner.run(context -> assertThat(context)
+                .doesNotHaveBean(ProcessLifecycleManager.class)
+                .doesNotHaveBean(WatchdogAgent.class)
+                .doesNotHaveBean(WatchdogCommandController.class));
+    }
+
+    @Test
+    void registersFullWatchdogStackWhenExplicitlyEnabled() {
+        contextRunner
+                .withPropertyValues("jesus.watchdog.enabled=true")
+                .run(context -> assertThat(context)
                 .hasSingleBean(WatchdogProperties.class)
                 .hasSingleBean(ProcessLifecycleManager.class)
                 .hasSingleBean(VitalsRegistry.class)
