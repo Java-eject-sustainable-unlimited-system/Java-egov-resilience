@@ -1,6 +1,7 @@
 package com.jesus.system.monitor;
 
 import com.jesus.system.config.WatchdogProperties;
+import com.jesus.system.core.ProcessLifecycleManager;
 import com.jesus.system.core.VitalsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,14 @@ public class AbyssProbeMonitor {
 
     private final WatchdogProperties properties;
     private final VitalsRegistry vitals;
+    private final ProcessLifecycleManager lifecycleManager;
+    private final FailureCounter failures = new FailureCounter();
 
-    public AbyssProbeMonitor(WatchdogProperties properties, VitalsRegistry vitals) {
+    public AbyssProbeMonitor(WatchdogProperties properties, VitalsRegistry vitals,
+                             ProcessLifecycleManager lifecycleManager) {
         this.properties = properties;
         this.vitals = vitals;
+        this.lifecycleManager = lifecycleManager;
     }
 
     @Scheduled(fixedRate = 1000)
@@ -41,11 +46,29 @@ public class AbyssProbeMonitor {
             socket.connect(
                     new InetSocketAddress(properties.getProbeHost(), properties.getProbePort()),
                     (int) properties.getProbeTimeout().toMillis());
-            vitals.reportUp(COMPONENT, "TCP handshake OK on port " + properties.getProbePort());
+            handleProbeResult(true);
         } catch (IOException e) {
-            String message = "Raw socket handshake failed on port " + properties.getProbePort();
-            vitals.reportDown(COMPONENT, message);
-            log.warn("[☠️ ABYSS ALERT] {} — target may be deadlocked.", message);
+            handleProbeResult(false);
+        }
+    }
+
+    void handleProbeResult(boolean alive) {
+        if (alive) {
+            failures.reset();
+            vitals.reportUp(COMPONENT, "TCP handshake OK on port " + properties.getProbePort());
+            return;
+        }
+
+        int failureCount = failures.recordFailure();
+        vitals.reportDown(COMPONENT,
+                "Raw socket handshake failed on port %d (%d/%d)"
+                        .formatted(properties.getProbePort(), failureCount, properties.getFailureThreshold()));
+        log.warn("[☠️ ABYSS ALERT] Raw socket handshake failed on port {} ({}/{}) — target may be deadlocked.",
+                properties.getProbePort(), failureCount, properties.getFailureThreshold());
+
+        if (failures.hasReached(properties.getFailureThreshold())) {
+            lifecycleManager.ejectAndResurrect("RAW_SOCKET_UNRESPONSIVE");
+            failures.reset();
         }
     }
 }

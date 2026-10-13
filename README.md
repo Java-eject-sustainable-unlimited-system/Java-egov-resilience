@@ -31,6 +31,10 @@ Technology Direction
 - Auditable recovery planning
 - Automated testing and security review
 
+Formal Verification
+
+OpenJML specifications and static checking are used for the failure counter's safety properties. The CI workflow runs OpenJML ESC on `FailureCounter.java`, checking its non-negative invariant, saturating failure increment, recovery, threshold, and reset contracts. This currently verifies the failure counter only; it does not formally verify the Spring framework or the complete application.
+
 Project Status
 
 Early-stage development.
