@@ -12,6 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.time.Duration;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -26,6 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ProcessLifecycleManager {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessLifecycleManager.class);
+
+    private static final Duration EXIT_WAIT = Duration.ofSeconds(5);
 
     private final WatchdogProperties properties;
     private final ProcessStarter processStarter;
@@ -60,11 +66,22 @@ public class ProcessLifecycleManager {
      */
     public int ejectTargetProcesses(String reason) {
         List<ProcessHandle> targets = findTargetProcesses();
-        targets.forEach(process -> {
+        int terminated = 0;
+        for (ProcessHandle process : targets) {
             log.warn("[🗡️ EJECT] Terminating PID {} [reason: {}]", process.pid(), reason);
-            process.destroyForcibly();
-        });
-        return targets.size();
+            try {
+                process.destroyForcibly();
+                process.onExit().get(EXIT_WAIT.toMillis(), TimeUnit.MILLISECONDS);
+                terminated++;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("[🗡️ EJECT] Interrupted while waiting for PID {} to exit.", process.pid());
+                break;
+            } catch (TimeoutException | ExecutionException | RuntimeException e) {
+                log.error("[💥] PID {} did not confirm termination: {}", process.pid(), e.getMessage());
+            }
+        }
+        return terminated;
     }
 
     /**
