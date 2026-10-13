@@ -29,6 +29,10 @@ public class WatchdogProperties {
     /** Actuator health endpoint of the monitored target. */
     private String healthEndpoint = "http://localhost:8080/actuator/health";
 
+    /** Origins the HTTP vitals probe is allowed to contact. */
+    private List<String> healthEndpointAllowedOrigins =
+            new ArrayList<>(List.of("http://localhost:8080"));
+
     /** Host of the monitored target for the raw TCP probe. */
     private String probeHost = "127.0.0.1";
 
@@ -91,6 +95,14 @@ public class WatchdogProperties {
 
     public void setHealthEndpoint(String healthEndpoint) {
         this.healthEndpoint = healthEndpoint;
+    }
+
+    public List<String> getHealthEndpointAllowedOrigins() {
+        return healthEndpointAllowedOrigins;
+    }
+
+    public void setHealthEndpointAllowedOrigins(List<String> healthEndpointAllowedOrigins) {
+        this.healthEndpointAllowedOrigins = healthEndpointAllowedOrigins;
     }
 
     public String getProbeHost() {
