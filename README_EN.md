@@ -19,7 +19,7 @@ This is not a production-certified recovery system. Recovery is destructive, dep
 * **Layered probes**: HTTP(S) health endpoint, raw TCP connectivity, optional JDBC connection validation, watchdog-JVM heap/deadlock diagnostics, and local disk/write checks.
 * **Threshold-based recovery**: Most probes require repeated failures before requesting ejection; a detected JVM deadlock and critically low disk space trigger immediately.
 * **Actuator health**: `/actuator/health` reports the watchdog's aggregate monitor vitals. The HTTP endpoint it probes is the monitored target's endpoint.
-* **Optional manual control**: `POST /api/jesus/eject-and-resurrect` is authorized by the `X-Watchdog-Token` header and is disabled unless a non-empty token is configured.
+* **Optional manual control**: `POST /api/jesus/eject-and-resurrect` is authorized by the `X-Watchdog-Token` header; requests are rejected unless a non-empty token is configured.
 
 ---
 
@@ -31,7 +31,7 @@ Jesus_system/
 │   └── workflows/
 │       └── ci.yml                     # GitHub Actions CI/CD Pipeline
 ├── flake.nix                          # Multi-platform Nix shell & build architecture
-├── pom.xml                            # Maven standard build config (Spring Boot 3.3.0)
+├── pom.xml                            # Maven build config (Spring Boot 4.1.1)
 └── src/
     └── main/
         ├── java/com/jesus/system/
@@ -43,11 +43,11 @@ Jesus_system/
         │   │   ├── ProcessLifecycleManager.java   # Single Eject & Nix Resurrection Core
         │   │   └── VitalsRegistry.java            # Shared Monitor Vitals Registry
         │   ├── monitor/
-        │   │   ├── WatchdogAgent.java             # 0.5s Actuator Ping & Ejection Loop
+        │   │   ├── WatchdogAgent.java             # 0.5s HTTP probe and threshold check
         │   │   ├── AbyssProbeMonitor.java         # Raw TCP Socket Low-Level Probe
         │   │   ├── EgovWatchdogMonitor.java       # eGovFrame DB & WAS Dual Verification
-        │   │   ├── JvmDiagnosticsMonitor.java     # JVM Heap & Deadlock Preemption Guard
-        │   │   ├── DiskIoGuardMonitor.java        # Disk I/O & Read-Only Lock Guard
+        │   │   ├── JvmDiagnosticsMonitor.java     # Watchdog JVM heap and deadlock checks
+        │   │   ├── DiskIoGuardMonitor.java        # Watchdog working-directory disk/I/O checks
         │   │   └── HttpVitalsProbe.java           # Shared HTTP Vitals Probe
         │   ├── api/
         │   │   └── WatchdogCommandController.java # Emergency Manual Control REST API
@@ -86,7 +86,7 @@ mvn spring-boot:run
 ## 📦 Adopting into an Existing Spring App (Starter Mode)
 
 
-Any Spring Boot 3 application (e.g. a modernized eGovFrame service) can embed the full watchdog into its core with a single dependency:
+Any Spring Boot 4 application using Java 17 or later (e.g. a compatible modernized eGovFrame service) can embed the watchdog with a single dependency:
 
 
 <dependency>
