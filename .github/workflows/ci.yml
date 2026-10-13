@@ -16,7 +16,7 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up JDK & Maven
         uses: actions/setup-java@v5
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Install pinned OpenJML
         run: |
