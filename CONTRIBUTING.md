@@ -25,3 +25,5 @@ If you change a contract, update the matching JUnit test and [docs/TRACEABILITY.
 2. Keep changes small and focused; add or update JUnit tests.
 3. Make sure `mvn clean verify` passes; CI also runs OpenJML and CodeQL.
 4. Describe which requirement or safety property your change affects.
+
+Non-draft pull requests targeting `main` or `master` are automatically queued for squash auto-merge. GitHub merges them when all configured required checks and reviews pass. Repository maintainers must enable **Allow auto-merge** and configure branch protection/rulesets with the required checks and review requirements; without required protections, GitHub may merge as soon as auto-merge is enabled. The automation only calls GitHub's merge API and does not check out or run pull-request code.
