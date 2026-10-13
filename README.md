@@ -66,3 +66,5 @@ Java, 전자정부 표준프레임워크, Jesus_system 기반 상태 감시 기�
 장기적으로 국제 개발자와 연구자가 공동 운영하는 독립적인 비영리 오픈소스 재단으로 발전하는 것을 목표로 합니다.
 
 함께 검증하고, 함께 복원력을 높입니다.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [docs/TRACEABILITY.md](docs/TRACEABILITY.md).
