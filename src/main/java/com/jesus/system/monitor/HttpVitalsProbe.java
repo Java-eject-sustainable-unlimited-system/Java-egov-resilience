@@ -33,7 +33,7 @@ public class HttpVitalsProbe {
     }
 
     /**
-     * @return true if the endpoint answers with a non-5xx status within the configured timeout
+     * @return true if the endpoint answers with a 2xx/3xx status within the configured timeout
      */
     public boolean isAlive(String endpoint) {
         URI uri;
@@ -60,7 +60,7 @@ public class HttpVitalsProbe {
                     .GET()
                     .build();
             int status = httpClient.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
-            return status >= 200 && status < 500;
+            return status >= 200 && status < 400;
         } catch (IOException e) {
             log.debug("HTTP vitals probe failed due to an I/O error");
             return false;

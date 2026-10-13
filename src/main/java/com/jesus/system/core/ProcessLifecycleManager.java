@@ -102,6 +102,12 @@ public class ProcessLifecycleManager {
         if (process.pid() == ProcessHandle.current().pid()) {
             return false;
         }
+        // Only terminate processes owned by the same OS user as the watchdog.
+        String owner = process.info().user().orElse(null);
+        String self = ProcessHandle.current().info().user().orElse(null);
+        if (owner == null || !owner.equals(self)) {
+            return false;
+        }
         return matchesTarget(
                 process.info().command().orElse(""),
                 process.info().arguments().orElse(new String[0]),
@@ -118,7 +124,11 @@ public class ProcessLifecycleManager {
         String normalizedCommand = (command == null ? "" : command).toLowerCase(Locale.ROOT);
         String normalizedArguments = String.join(" ", arguments == null ? new String[0] : arguments)
                 .toLowerCase(Locale.ROOT);
-        return normalizedCommand.contains(commandKeyword.toLowerCase(Locale.ROOT))
+        String keyword = commandKeyword.toLowerCase(Locale.ROOT);
+        String executable = normalizedCommand.substring(
+                Math.max(normalizedCommand.lastIndexOf('/'), normalizedCommand.lastIndexOf('\\')) + 1);
+        return !keyword.isBlank()
+                && (executable.equals(keyword) || executable.equals(keyword + ".exe"))
                 && targetKeywords.stream()
                         .map(keyword -> keyword.toLowerCase(Locale.ROOT))
                         .anyMatch(normalizedArguments::contains);
