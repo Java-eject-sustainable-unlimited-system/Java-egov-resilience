@@ -4,6 +4,7 @@ import com.jesus.system.config.WatchdogProperties;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +42,19 @@ class ProcessLifecycleManagerTest {
         assertThat(ProcessLifecycleManager.matchesTarget(
                 "java", new String[]{"-jar", "jesus-watchdog-agent.jar"},
                 "java", List.of("egov")))
+                .isFalse();
+    }
+
+    @Test
+    void rejectsMissingOrBlankTargetKeywords() {
+        assertThat(ProcessLifecycleManager.matchesTarget(
+                "java", new String[]{"-Dapp=unrelated"}, "java", Arrays.asList("", "  ", null)))
+                .isFalse();
+        assertThat(ProcessLifecycleManager.matchesTarget(
+                "java", new String[]{"-Dapp=egov"}, "java", null))
+                .isFalse();
+        assertThat(ProcessLifecycleManager.matchesTarget(
+                "java", new String[]{"-Dapp=egov"}, "  ", List.of("egov")))
                 .isFalse();
     }
 
