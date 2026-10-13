@@ -8,8 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -121,16 +123,25 @@ public class ProcessLifecycleManager {
      */
     static boolean matchesTarget(String command, String[] arguments,
                                  String commandKeyword, List<String> targetKeywords) {
+        if (commandKeyword == null || commandKeyword.isBlank() || targetKeywords == null) {
+            return false;
+        }
+
         String normalizedCommand = (command == null ? "" : command).toLowerCase(Locale.ROOT);
-        String normalizedArguments = String.join(" ", arguments == null ? new String[0] : arguments)
+        String normalizedArguments = Arrays.stream(arguments == null ? new String[0] : arguments)
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.joining(" "))
                 .toLowerCase(Locale.ROOT);
-        String keyword = commandKeyword.toLowerCase(Locale.ROOT);
+        String keyword = commandKeyword.trim().toLowerCase(Locale.ROOT);
         String executable = normalizedCommand.substring(
                 Math.max(normalizedCommand.lastIndexOf('/'), normalizedCommand.lastIndexOf('\\')) + 1);
         return !keyword.isBlank()
                 && (executable.equals(keyword) || executable.equals(keyword + ".exe"))
                 && targetKeywords.stream()
-                        .map(keyword -> keyword.toLowerCase(Locale.ROOT))
+                        .filter(Objects::nonNull)
+                        .map(String::trim)
+                        .filter(targetKeyword -> !targetKeyword.isEmpty())
+                        .map(targetKeyword -> targetKeyword.toLowerCase(Locale.ROOT))
                         .anyMatch(normalizedArguments::contains);
     }
 
