@@ -6,6 +6,7 @@ on:
     types: [ opened, reopened, synchronize, ready_for_review ]
 
 permissions:
+  checks: read
   contents: write
   pull-requests: write
 
@@ -14,8 +15,60 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
+      - name: Wait for required PR checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          required_checks=(
+            "Build & Verify (Java 17)"
+            "OpenJML Formal Verification"
+            "Analyze (actions)"
+            "Analyze (java-kotlin)"
+          )
+
+          for attempt in {1..120}; do
+            checks="$(gh api "repos/$GITHUB_REPOSITORY/commits/$PR_HEAD_SHA/check-runs?per_page=100")"
+            all_passed=true
+
+            for check in "${required_checks[@]}"; do
+              result="$(jq -r --arg name "$check" '
+                [.check_runs[] | select(.name == $name)]
+                | if length == 0 then "missing"
+                  else (max_by(.id)
+                    | if .status != "completed" then "pending"
+                      elif .conclusion == "success" then "success"
+                      else "failed (\(.conclusion // "unknown"))"
+                      end)
+                  end
+              ' <<< "$checks")"
+
+              case "$result" in
+                success) ;;
+                failed*)
+                  echo "Required PR check '$check' $result."
+                  exit 1
+                  ;;
+                *)
+                  echo "Waiting for required PR check '$check': $result."
+                  all_passed=false
+                  ;;
+              esac
+            done
+
+            if [[ "$all_passed" == true ]]; then
+              echo "All required PR checks passed."
+              exit 0
+            fi
+
+            sleep 15
+          done
+
+          echo "Timed out waiting for required PR checks."
+          exit 1
       - name: Queue squash auto-merge
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: gh pr merge "$PR_NUMBER" --auto --squash --repo "$GITHUB_REPOSITORY"
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: gh pr merge "$PR_NUMBER" --auto --squash --match-head-commit "$PR_HEAD_SHA" --repo "$GITHUB_REPOSITORY"
