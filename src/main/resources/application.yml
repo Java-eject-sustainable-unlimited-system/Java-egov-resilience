@@ -22,6 +22,8 @@ jesus:
     manual-control-token: ${JESUS_WATCHDOG_MANUAL_CONTROL_TOKEN:}
     # Monitored target endpoints
     health-endpoint: http://localhost:8080/actuator/health
+    # Add each intended HTTP(S) origin explicitly when monitoring a remote target.
+    health-endpoint-allowed-origins: [ http://localhost:8080 ]
     probe-host: 127.0.0.1
     probe-port: 8080
     # Timeouts
