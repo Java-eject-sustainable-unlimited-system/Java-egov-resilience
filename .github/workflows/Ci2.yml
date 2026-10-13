@@ -16,20 +16,19 @@ jobs:
           repository: ${{github.event.pull_request.head.repo.full_name}}
           ref: ${{github.event.pull_request.head.ref}}
           submodules: false
+          persist-credentials: false
 
-      - uses: unsafecoerce/chatgpt-action@main
+      - uses: unsafecoerce/chatgpt-action@6be9a051fadd211ed323bcf2304e6de6d07e7cc6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHATGPT_ACCESS_TOKEN: ${{ secrets.CHATGPT_ACCESS_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           debug: false
           action: score
 
-      - uses: unsafecoerce/chatgpt-action@main
+      - uses: unsafecoerce/chatgpt-action@6be9a051fadd211ed323bcf2304e6de6d07e7cc6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHATGPT_ACCESS_TOKEN: ${{ secrets.CHATGPT_ACCESS_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           debug: false
