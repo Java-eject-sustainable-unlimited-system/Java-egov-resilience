@@ -130,7 +130,7 @@ public class ProcessLifecycleManager {
         return !keyword.isBlank()
                 && (executable.equals(keyword) || executable.equals(keyword + ".exe"))
                 && targetKeywords.stream()
-                        .map(keyword -> keyword.toLowerCase(Locale.ROOT))
+                        .map(targetKeyword -> targetKeyword.toLowerCase(Locale.ROOT))
                         .anyMatch(normalizedArguments::contains);
     }
 
