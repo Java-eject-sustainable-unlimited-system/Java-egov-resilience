@@ -55,6 +55,10 @@ Licensing
 
 This project uses the MIT License. Commercial and noncommercial use are permitted under its terms. Copyright and license notices from upstream projects must be preserved.
 
+## Watchdog Application Documentation
+
+For the Java watchdog's build and run instructions, activation requirements, safety notes, monitor behavior, and configuration reference, see [README_EN.md](README_EN.md).
+
 한국어 소개
 
 Electrical eGov Resilience는 전력망 사이버보안과 국가 핵심 인프라의 복원력 향상을 목표로 하는 무료 오픈소스 연구 프로젝트입니다.
