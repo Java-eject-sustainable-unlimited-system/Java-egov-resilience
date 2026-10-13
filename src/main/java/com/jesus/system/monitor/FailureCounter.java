@@ -5,7 +5,7 @@ final class FailureCounter {
     //@ spec_public
     private int consecutiveFailures;
 
-    //@ invariant consecutiveFailures >= 0;
+    //@ public invariant consecutiveFailures >= 0;
 
     //@ ensures consecutiveFailures == (\old(consecutiveFailures) < Integer.MAX_VALUE
     //@     ? \old(consecutiveFailures) + 1 : Integer.MAX_VALUE);

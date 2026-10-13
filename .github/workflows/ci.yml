@@ -38,3 +38,25 @@ jobs:
           mvn clean verify
 
           echo " [✨] Build, Packaging & Tests Successful!"
+
+  openjml-formal-verification:
+    name: OpenJML Formal Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Install pinned OpenJML
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/openjml.zip" \
+            https://github.com/OpenJML/OpenJML/releases/download/21.0.28/openjml-ubuntu-24.04-21.0.28.zip
+          echo "0a151820c4e680e32cb2e399a02615182c748fc24e308865b317783d4836df8a  $RUNNER_TEMP/openjml.zip" \
+            | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/openjml"
+          unzip -q "$RUNNER_TEMP/openjml.zip" -d "$RUNNER_TEMP/openjml"
+
+      - name: Verify failure counter contracts
+        run: |
+          "$RUNNER_TEMP/openjml/openjml" --esc --source 17 \
+            src/main/java/com/jesus/system/monitor/FailureCounter.java
