@@ -59,7 +59,7 @@ Jesus_system/
 
 
 
-🚀 Quick Start & Build
+## 🚀 Quick Start & Build
 
 
 1. Enter Nix Environment (Recommended)
@@ -83,7 +83,7 @@ mvn spring-boot:run
 
 
 
-📦 Adopting into an Existing Spring App (Starter Mode)
+## 📦 Adopting into an Existing Spring App (Starter Mode)
 
 
 Any Spring Boot 3 application (e.g. a modernized eGovFrame service) can embed the full watchdog into its core with a single dependency:
@@ -96,11 +96,55 @@ Any Spring Boot 3 application (e.g. a modernized eGovFrame service) can embed th
 </dependency>
 
 
-Just having it on the classpath auto-registers every monitor, the health indicator, and the REST API. Disable anytime with jesus.watchdog.enabled=false. Configure `JESUS_WATCHDOG_MANUAL_CONTROL_TOKEN` to enable the emergency endpoint; leave it unset to keep manual ejection disabled.
+Adding the dependency makes the auto-configuration available, but does **not** activate it by default. To opt in, set `jesus.watchdog.enabled=true`; leave it absent or set it to `false` to keep the watchdog inactive. The standalone application explicitly opts in through its `application.yml`.
+
+Configure `JESUS_WATCHDOG_MANUAL_CONTROL_TOKEN` to enable the manual endpoint. The default standalone server binds to `127.0.0.1:9090`; change the bind address only if remote access is intentional and protected by your network controls. The token is an additional authorization check, not a replacement for network-level access control.
 
 
-⚠️ javax-era eGovFrame (Spring Boot 2.x) hosts cannot embed it directly due to the Jakarta namespace split — keep running the watchdog in standalone (sidecar) mode for those systems.
+⚠️ javax-era eGovFrame (Spring Boot 2.x) hosts cannot embed it directly due to the Jakarta namespace split — use the standalone mode for those systems.
 
+## ⚙️ Configuration Reference
+
+All watchdog settings use the `jesus.watchdog` prefix. The table lists the defaults declared by the application; an embedded host must supply any target-specific values it needs.
+
+| Property | Default | Purpose |
+| --- | --- | --- |
+| `enabled` | `false` for embedded auto-configuration; `true` in standalone `application.yml` | Explicitly opts into watchdog registration and scheduled monitoring. |
+| `process-command-keyword` | `java` | Required Java executable name when matching target processes. |
+| `target-process-keywords` | `[egov, tomcat]` | A matching process must contain at least one keyword in its arguments. |
+| `nix-run-target` | `.#jesus-server-17` | Nix flake target started after ejection. |
+| `manual-control-token` | empty | Shared secret required by the manual control endpoint. Configure via `JESUS_WATCHDOG_MANUAL_CONTROL_TOKEN`. |
+| `health-endpoint` | `http://localhost:8080/actuator/health` | HTTP(S) endpoint probed for target health. |
+| `health-endpoint-allowed-origins` | `[http://localhost:8080]` | Explicit origin allowlist for the HTTP probe; include each intended target origin. |
+| `probe-host` / `probe-port` | `127.0.0.1` / `8080` | Host and port used by the raw TCP probe. |
+| `probe-timeout` / `http-timeout` | `300ms` / `1500ms` | TCP connect timeout and HTTP request timeout. |
+| `failure-threshold` / `io-failure-threshold` | `3` / `2` | Consecutive failures required for health and I/O ejection. |
+| `heap-critical-threshold` | `0.92` | Watchdog JVM heap usage ratio considered critical. |
+| `min-free-disk-space` | `500MB` | Minimum available space in the watchdog's current working directory. |
+
+Set these as Spring properties, environment variables, or YAML configuration. The HTTP allowlist compares scheme, host, and port; setting a remote `health-endpoint` without adding its origin to `health-endpoint-allowed-origins` makes the probe fail without sending a request.
+
+## 🔍 Monitor Behavior
+
+| Monitor | Interval | Recovery condition |
+| --- | --- | --- |
+| HTTP actuator probe | 500 ms | Eject after `failure-threshold` consecutive unsuccessful checks. |
+| eGov composite | 2 s | Eject after `failure-threshold` consecutive failures of HTTP or configured `DataSource`; the JDBC check is skipped when no `DataSource` exists. |
+| Raw TCP probe | 1 s | Eject after `failure-threshold` consecutive connection failures. |
+| JVM diagnostics | 5 s | Heap pressure ejects after `failure-threshold` checks; deadlocked threads trigger immediately. |
+| Disk and I/O guard | 10 s | Low disk space triggers once per low-space incident; failed write probes eject after `io-failure-threshold` failures. |
+
+Threshold counters are maintained independently by each monitor. A successful probe resets its counter, except heap pressure, which recovers one failure at a time when heap use falls below the configured threshold.
+
+Process termination excludes the watchdog's own PID and only matches processes owned by the same OS user. The executable must match `process-command-keyword`, and at least one configured target keyword must appear in the process arguments. Matching processes are forcibly terminated; the configured Nix target is then started if no resurrection is already in progress.
+
+## 🔐 Safety and Access
+
+* Watchdog activation enables scheduled checks that can terminate processes. Test process matching and recovery configuration in an isolated environment before enabling it against real services.
+* The manual API accepts only `POST /api/jesus/eject-and-resurrect` with an `X-Watchdog-Token` value equal to the configured token. It returns `401 Unauthorized` if the token is unset or incorrect.
+* The standalone server binds to loopback and exposes only the Actuator health endpoint over HTTP by default. Avoid exposing the manual API to untrusted networks.
+* `/actuator/health` describes this watchdog's reported monitor vitals; it is not a direct health response from the monitored target.
+* The project is early-stage, uncertified, and not ready for operational deployment.
 
 
 🧪 Test & Formal Verification (Nix)
@@ -124,12 +168,10 @@ nix build .#jesus-server-17
 
 
 
-📊 CI/CD Status
+## 📊 CI/CD Status
 
 
-J.E.S.U.S CI/CD Pipeline
+The GitHub Actions workflow runs `mvn clean verify` with Java 17 and separately runs OpenJML ESC on `FailureCounter.java`. Formal verification applies to that counter's contracts only, not to Spring or the complete application.
 
 
 ---
-
-
