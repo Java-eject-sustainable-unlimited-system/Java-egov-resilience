@@ -1,4 +1,5 @@
 with Ada.Strings.Unbounded;
+with Ada.Unchecked_Deallocation;
 with Interfaces;
 
 package body Class_File_Reader is
@@ -13,6 +14,8 @@ package body Class_File_Reader is
 
    type Constant_Pool is array (Natural range <>) of Constant_Pool_Entry;
    type Constant_Pool_Access is access Constant_Pool;
+   procedure Release is new Ada.Unchecked_Deallocation
+     (Constant_Pool, Constant_Pool_Access);
 
    procedure Extract_Static_Method
      (Class_Bytes : Ada.Streams.Stream_Element_Array;
@@ -169,7 +172,7 @@ package body Class_File_Reader is
                         if Found then
                            raise Class_File_Error with
                              "duplicate matching method";
-                        elsif Access_Flags mod 16#10# / 8 = 0 then
+                        elsif (Access_Flags / 8) mod 2 = 0 then
                            raise Class_File_Error with
                              "selected method is not static";
                         end if;
@@ -268,5 +271,12 @@ package body Class_File_Reader is
       elsif not Found then
          raise Class_File_Error with "selected static method was not found";
       end if;
+      Release (Pool);
+   exception
+      when others =>
+         if Pool /= null then
+            Release (Pool);
+         end if;
+         raise;
    end Extract_Static_Method;
 end Class_File_Reader;
