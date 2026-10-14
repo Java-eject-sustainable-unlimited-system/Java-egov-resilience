@@ -77,4 +77,4 @@ Java, 전자정부 표준프레임워크, Jesus_system 기반 상태 감시 기�
 
 함께 검증하고, 함께 복원력을 높입니다.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [docs/TRACEABILITY.md](docs/TRACEABILITY.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [ACCESSIBILITY.md](ACCESSIBILITY.md) and [docs/TRACEABILITY.md](docs/TRACEABILITY.md).

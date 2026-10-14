@@ -1,95 +1,36 @@
-# Accessibility 
+# Accessibility
 
-<!--
-Include a brief statement describing why accessibility matters to your
-project, who should be able to use and contribute to it, and what this
-document covers, such as your accessibility commitments, contributor
-expectations, and issue-reporting process.
-
-Write for people who may read this after encountering a barrier. Use plain
-language and describe user experiences rather than relying on legal
-language, technical jargon, or standards codes.
--->
+We want people to be able to read, use, and contribute to this project regardless of how they access information. This project is an early-stage Java watchdog with command-line workflows and documentation; it does not currently provide a graphical user interface.
 
 ## Priorities
 
-<!--
-Describe the outcomes the project prioritizes and how it works toward them.
-If you name a WCAG level as an accessibility target, make clear that it is
-an aspirational goal rather than a verified conformance claim. Only claim
-conformance after an evaluation, and identify the evaluated scope, date,
-method, and evaluator. Also describe the areas you prioritize, such as
-keyboard, screen reader, content, or language support.
--->
+- Write documentation in clear language with descriptive headings and links.
+- Keep instructions and important information available as text, not only as images or color.
+- Preserve readable Markdown structure, including heading order and meaningful table headers.
+- Avoid adding user-facing interaction that depends only on a mouse, color, or visual cues.
+
+These are project priorities, not a claim of conformance to an accessibility standard. No formal accessibility evaluation has been completed.
 
 ## Contributor expectations
 
-<!--
-Describe the accessibility guardrails that apply to contributions,
-including relevant testing, documentation, and continuous integration
-checks. Name specific tools only when the project uses them, and explain
-what evidence contributors should include with user-facing changes.
--->
+When changing user-facing documentation or adding an interface, consider keyboard use, screen-reader reading order, text alternatives, and clear error messages. Describe any accessibility checks performed in the pull request, and report known limitations rather than implying that a change has been fully evaluated.
 
 ## Reporting accessibility issues
 
-<!--
-Provide a direct, accessible way to report a barrier or request help.
-Invite useful context such as the affected task, URL, observed behavior,
-browser, operating system, and assistive technology. Make screenshots or
-recordings optional and do not require disability disclosure.
--->
+Please open an issue in this repository describing the barrier and the task you were trying to complete. Include relevant page or file names, observed behavior, and browser, operating system, terminal, or assistive technology details when useful. Screenshots and recordings are optional. Do not include sensitive personal information; report security vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 
-### Severity
-
-<!--
-If your project uses severity levels, define them and give practical
-examples based on how strongly a barrier affects a user's ability to
-complete a task. Keep labels consistent with your issue template and
-resolution targets if those processes exist. Maintainers can assign or
-confirm severity during triage; reporters do not need to.
--->
-
-### How we respond
-
-<!--
-Explain what reporters can expect after submitting an accessibility issue,
-including acknowledgement, status updates, workarounds, expected timelines,
-and opportunities to verify a fix. Use commitments your project can
-consistently uphold.
--->
+There are no formal severity labels or response-time commitments for accessibility reports. Maintainers will triage issues based on how much they prevent people from reading, using, or contributing to the project and provide updates in the issue as work progresses.
 
 ## Ownership and maintenance
 
-<!--
-Identify the team, role, or maintainer responsible for accessibility and
-describe their responsibilities to the project. Include the review cadence
-and how ownership transfers when responsibilities change.
--->
+Repository maintainers are responsible for reviewing accessibility reports and considering accessibility in documentation and user-facing changes. This statement should be updated when project interfaces, support, or evaluation practices change.
 
-## Supported environments
+## Supported environments and known limitations
 
-<!--
-List the platforms, devices, browsers, input methods, and assistive
-technologies the project supports or has tested. Include versions where
-useful, note partial support, and avoid implying support for combinations
-that have not been evaluated.
--->
+The project documents Java and Maven command-line workflows, but does not specify or claim support for particular operating systems, terminals, browsers, or assistive technologies. No combinations have been formally evaluated.
 
-## Known limitations
-
-<!--
-Describe known barriers in terms of the affected user experience, such as
-"videos do not have captions," rather than standards codes. Include
-available workarounds or equivalent access and link to tracked issues. If
-no limitations are currently documented, describe what has been tested
-instead of claiming that no barriers exist.
--->
+Some Markdown tables and decorative emoji are used in the README files; their presentation and announcement can vary between readers and assistive technologies. The project has not completed a systematic review of its documentation or command-line experience, so additional barriers may remain.
 
 ## Feedback and improvements
 
-<!--
-Explain how users and contributors can suggest improvements to this
-statement or the project's accessibility practices. Direct active
-accessibility barriers to the reporting process above.
--->
+Suggestions for this statement or the project's accessibility practices can be submitted as repository issues. Please link to the relevant section and describe the improvement you recommend.
