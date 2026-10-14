@@ -41,10 +41,30 @@ built-in interpreter checks.
 
 ## Java 25 compatibility roadmap
 
-Full Java 25 compatibility is a substantial runtime implementation, not a
-single feature. Beyond this initial class-file reader, the prototype will need
-verification, class loading and linking, the complete instruction set and
-runtime data areas, exceptions, object and array semantics, native/platform
-interfaces, garbage collection, and the Java 25 standard library. These are
-not implemented here. Each milestone should add conformance tests before
-claiming support.
+The target is **Java SE 25 runtime compatibility**, including the Java Virtual
+Machine Specification (JVMS) and the Java SE 25 API specification. This project
+is a runtime, not a Java source compiler: accepting Java 25 source syntax is
+outside its scope. Compatibility includes class-file versions and features,
+verification, linking and execution semantics, and the specified Java SE APIs;
+support for only the class-file major version or a subset of bytecodes is not
+full compatibility.
+
+### Conformance strategy
+
+Build a conformance suite from small Java programs and class files compiled
+with a Java 25 JDK. Run each supported fixture both on this runtime and on an
+independent Java 25 reference JVM, then compare specified observable behavior:
+return values, output, exit status, and exception behavior. Include valid
+fixtures as well as malformed or unsupported inputs, which must be rejected
+safely rather than misinterpreted. Keep fixtures and expected outcomes
+reproducible, and organize them by JVMS and Java SE API feature so gaps remain
+visible. Use the official Java compatibility test suite when its terms and
+availability permit; a local differential suite alone is not a certification.
+
+Do not claim Java 25 compatibility until the implementation covers the defined
+runtime and API scope and passes the applicable conformance suite. The current
+prototype does not meet that bar: verification, class loading and linking,
+most instructions, runtime data areas, exceptions, objects and arrays,
+platform interfaces, garbage collection, and the Java SE library remain
+unimplemented. Implementation and conformance testing must advance together
+through these milestones.
